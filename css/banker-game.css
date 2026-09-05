@@ -1,0 +1,1036 @@
+/* ==========================================================================
+   KERNEL MASTER: Mode 1 - Light Theme Resource Allocation UI & Animations
+   ========================================================================== */
+
+/* Subbar */
+.banker-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 12px 18px;
+  flex-wrap: wrap;
+}
+
+.subbar-left, .subbar-center, .subbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selector-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Campaign Level Banner */
+.level-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 14px 20px;
+  background: var(--bg-surface);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.banner-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-bg);
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.banner-badge.safe {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.banner-badge.unsafe {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.banner-badge.deadlock {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.banner-content {
+  flex: 1;
+}
+
+.banner-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.banner-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.banner-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.stat-pill {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stat-lbl {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Sandbox Config Panel */
+.sandbox-config {
+  margin-bottom: 16px;
+}
+
+.sandbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sandbox-header h3 {
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.sandbox-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sandbox-controls-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.config-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Banker Grid Layout */
+.banker-grid {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Resources Dock (Left Sidebar) */
+.resources-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 10px;
+}
+
+.panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title-wrap h3 {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.panel-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.panel-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Available Resources Pool Cards */
+.resources-pool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resource-pool-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: grab;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.resource-pool-card:hover {
+  border-color: var(--res-color, var(--primary));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.resource-pool-card.allocated-pulse {
+  animation: poolPulse 0.4s ease;
+}
+
+@keyframes poolPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.96); background: var(--primary-bg); }
+  100% { transform: scale(1); }
+}
+
+.resource-pool-card.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.res-info-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.res-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--res-bg, var(--primary-bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid var(--res-color, var(--border-subtle));
+}
+
+.res-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.res-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.res-total-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.res-avail-count {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.avail-num {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--res-color, var(--primary));
+  transition: transform 0.2s ease;
+}
+
+.avail-total-slash {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Deadlock Recovery Deck */
+.deadlock-recovery-deck {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deadlock-recovery-deck h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--danger-text);
+}
+
+.deck-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.deck-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+/* View Mode Selector */
+.view-mode-selector {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-surface-elevated);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.view-switch-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.view-switch-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   PROCESS CARDS (Simple, High-Contrast & Animated)
+   ========================================================================== */
+.process-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 16px;
+}
+
+.process-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-card);
+}
+
+.process-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Allocation Ripple Animation on Process Card */
+.process-card.receive-pulse {
+  animation: cardReceive 0.35s ease;
+}
+
+@keyframes cardReceive {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); box-shadow: 0 0 16px var(--primary-glow); }
+  100% { transform: scale(1); }
+}
+
+/* Status States */
+.process-card.status-can-run {
+  border-color: var(--success);
+  background: var(--success-bg);
+  box-shadow: 0 4px 18px rgba(5, 150, 105, 0.15);
+  animation: canRunPulse 2s infinite ease-in-out;
+}
+
+@keyframes canRunPulse {
+  0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+}
+
+.process-card.status-running {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+  box-shadow: 0 4px 18px var(--primary-glow);
+}
+
+.process-card.status-completed {
+  border-color: var(--border-subtle);
+  opacity: 0.6;
+  background: var(--bg-surface-elevated);
+}
+
+.process-card.status-deadlocked {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.process-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.proc-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.proc-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--primary-bg);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.proc-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.proc-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.proc-status-badge.waiting {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.proc-status-badge.can-run {
+  background: var(--success);
+  color: #ffffff;
+}
+
+.proc-status-badge.running {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.proc-status-badge.completed {
+  background: var(--border-strong);
+  color: var(--text-muted);
+}
+
+/* Resources Breakdown Table */
+.proc-resources-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.proc-resources-table th {
+  color: var(--text-muted);
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.proc-resources-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.res-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  color: var(--res-color, var(--text-primary));
+}
+
+.res-alloc-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-alloc-mini {
+  width: 24px;
+  height: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-alloc-mini:hover:not(:disabled) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.btn-alloc-mini:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Process Execution Progress Bar */
+.proc-progress-wrap {
+  width: 100%;
+  height: 8px;
+  background: var(--border-subtle);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.proc-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.1s linear;
+}
+
+/* Process Card Footer */
+.proc-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-quick-fill {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.btn-run-proc {
+  font-size: 12px;
+  padding: 7px 16px;
+  font-weight: 700;
+}
+
+/* Drag over highlight */
+.process-card.drag-over {
+  border-color: var(--primary) !important;
+  background: var(--primary-bg) !important;
+}
+
+/* ==========================================================================
+   ACADEMIC MATRIX VIEW
+   ========================================================================== */
+.matrix-tables-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.matrix-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.matrix-header h3 {
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.formula-chip {
+  font-size: 12px;
+  background: var(--primary-bg);
+  border: 1px solid var(--primary);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.matrix-quad {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.matrix-block {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.matrix-block h4 {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+}
+
+.matrix-table th {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  padding: 6px 8px;
+  border: 1px solid var(--border-subtle);
+  font-weight: 700;
+}
+
+.matrix-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.matrix-table tr.finished-row {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.banker-proof-box {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.banker-proof-box h4 {
+  font-size: 13px;
+  color: var(--success-text);
+  margin-bottom: 8px;
+  font-weight: 800;
+}
+
+.proof-log-terminal {
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-height: 160px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+.proof-log-terminal .log-step {
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+
+.proof-log-terminal .log-success {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.proof-log-terminal .log-fail {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   USER PROCESS EXECUTION QUEUE PANEL
+   ========================================================================== */
+.user-queue-panel {
+  margin-bottom: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--primary-border, var(--border-strong));
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  transition: all 0.25s ease;
+}
+
+.queue-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.queue-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.queue-title-wrap .panel-icon {
+  font-size: 20px;
+}
+
+.queue-heading-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.queue-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+
+.queue-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.queue-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.queue-count-pill {
+  background: var(--primary-bg);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* Pipeline Track & Chips */
+.user-queue-track-wrap {
+  background: var(--bg-surface-elevated);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+
+.user-queue-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.user-queue-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.user-queue-empty .empty-icon {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.user-queue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-queue-chip:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.user-queue-chip .chip-step-idx {
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.user-queue-chip .chip-proc-name {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.user-queue-chip .chip-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
+}
+
+.btn-chip-action {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  padding: 2px 5px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.12s ease;
+}
+
+.btn-chip-action:hover:not(:disabled) {
+  background: var(--primary-bg);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-chip-action.del:hover {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+/* Chip execution states */
+.user-queue-chip.running {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+  animation: pulse-border 1s infinite alternate;
+}
+
+.user-queue-chip.done {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-text);
+  opacity: 0.75;
+}
+
+.user-queue-chip.stalled {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  animation: shake 0.3s ease;
+}
+
+/* Queue Arrow separator */
+.queue-arrow {
+  color: var(--text-muted);
+  font-weight: 800;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* User Queue Footer */
+.user-queue-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.quick-add-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-add-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.quick-add-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-quick-add-proc {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-quick-add-proc:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-quick-add-proc:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-quick-add-proc.proc-done-tag {
+  border-color: var(--success-border);
+  color: var(--success-text);
+  background: var(--success-bg);
+}
+
+.queue-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Feedback Bar */
+.queue-feedback-bar {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+.queue-feedback-bar.success {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success-text);
+}
+
+.queue-feedback-bar.error {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+}
+
+.queue-feedback-bar.info {
+  background: var(--primary-bg);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
+}
+
+/* Add to Queue Button on Process Card */
+.btn-add-queue-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.btn-add-queue-card:hover:not(:disabled) {
+  background: var(--primary-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4); }
+  100% { box-shadow: 0 0 0 6px rgba(2, 132, 199, 0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+

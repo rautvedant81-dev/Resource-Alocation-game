@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OS Resource Manager & CPU Scheduler</title>
+  <meta name="description" content="An interactive and easy-to-play Operating System game featuring Banker's Algorithm, Deadlock Avoidance, and CPU Scheduling algorithms.">
+  
+  <!-- Google Fonts: Inter for clean readability & JetBrains Mono for numbers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/cyber-ui.css">
+  <link rel="stylesheet" href="css/banker-game.css">
+  <link rel="stylesheet" href="css/cpu-scheduler.css">
+  <link rel="stylesheet" href="css/rag-canvas.css">
+</head>
+<body>
+  <!-- Particle Canvas for Rewards -->
+  <canvas id="particleCanvas" class="particle-overlay"></canvas>
+
+  <!-- Top Navigation & OS Status Bar -->
+  <header class="os-header">
+    <div class="header-left">
+      <div class="logo-group">
+        <span class="kernel-icon">⚙️</span>
+        <div class="logo-text">
+          <h1 class="logo-title">OS RESOURCE <span class="logo-accent">MANAGER</span></h1>
+          <span class="logo-sub">Operating System Simulator</span>
+        </div>
+      </div>
+
+      <nav class="mode-tabs" role="tablist">
+        <button id="tabBanker" class="tab-btn active" role="tab" aria-selected="true" data-tab="banker-view">
+          <span class="tab-icon">🛡️</span>
+          <span class="tab-label">Resource Allocation</span>
+          <span class="badge-tag">Banker's Algo</span>
+        </button>
+        <button id="tabScheduler" class="tab-btn" role="tab" aria-selected="false" data-tab="scheduler-view">
+          <span class="tab-icon">⏱️</span>
+          <span class="tab-label">CPU Scheduling</span>
+          <span class="badge-tag">Gantt Chart</span>
+        </button>
+        <button id="tabRAG" class="tab-btn" role="tab" aria-selected="false" data-tab="rag-view">
+          <span class="tab-icon">🕸️</span>
+          <span class="tab-label">Resource Graph</span>
+          <span class="badge-tag">Cycle Detection</span>
+        </button>
+        <button id="tabTheory" class="tab-btn" role="tab" aria-selected="false" data-tab="theory-view">
+          <span class="tab-icon">📖</span>
+          <span class="tab-label">Learn OS</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <div class="hud-stats">
+        <div class="hud-item" title="Current Score">
+          <span class="hud-label">SCORE:</span>
+          <span id="hudScore" class="hud-val hud-accent">0</span>
+        </div>
+        <div class="hud-item" title="Active CPU Usage">
+          <span class="hud-label">CPU:</span>
+          <span id="hudCpuText" class="hud-val hud-cyan">25%</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="btnThemeToggle" class="icon-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+          <span id="themeIcon">☀️</span>
+        </button>
+        <button id="btnSoundToggle" class="icon-btn active" title="Toggle Sound (Web Audio)" aria-label="Toggle Sound">
+          <span id="soundIcon">🔊</span>
+        </button>
+        <button id="btnHelp" class="icon-btn" title="How to Play Tutorial" aria-label="Help">
+          <span>❓</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="main-container">
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 1: RESOURCE ALLOCATION & BANKER'S ALGORITHM GAME -->
+    <!-- ========================================================================= -->
+    <section id="banker-view" class="view-panel active">
+      <!-- Sub-Bar: Level Select, Game Controls, State Badges -->
+      <div class="banker-subbar glass-card">
+        <div class="subbar-left">
+          <div class="level-selector-group">
+            <span class="selector-label">LEVEL:</span>
+            <select id="bankerLevelSelect" class="cyber-select" aria-label="Select Level">
+              <!-- Populated by banker-levels.js -->
+            </select>
+            <button id="btnPrevLevel" class="cyber-btn sm" title="Previous Level">◀</button>
+            <button id="btnNextLevel" class="cyber-btn sm" title="Next Level">▶</button>
+          </div>
+
+          <div class="game-mode-toggle">
+            <button id="btnModeCampaign" class="toggle-pill active">Campaign Mode</button>
+            <button id="btnModeSandbox" class="toggle-pill">Custom Sandbox</button>
+          </div>
+        </div>
+
+        <div class="subbar-center">
+          <!-- Live System Safety Badge -->
+          <div id="safetyStateBadge" class="safety-badge safe">
+            <span id="safetyStatusText">🟢 SYSTEM STATE: SAFE</span>
+            <span id="safeSeqPreview" class="badge-sub">Safe State Active • Build queue to execute</span>
+          </div>
+        </div>
+
+        <div class="subbar-right">
+          <button id="btnRunUserQueueTop" class="cyber-btn glow-cyan" title="Execute User Process Queue">
+            <span class="btn-icon">▶</span> Execute Queue
+          </button>
+          <button id="btnCheckDeadlock" class="cyber-btn" title="Check if any processes are stuck in deadlock">
+            <span class="btn-icon">🔍</span> Detect Deadlock
+          </button>
+          <button id="btnResetLevel" class="cyber-btn danger" title="Reset Current Level">
+            <span class="btn-icon">🔄</span> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Campaign Level Info / Story Prompt Banner -->
+      <div id="levelPromptBanner" class="level-banner glass-card">
+        <div class="banner-badge" id="levelDifficultyBadge">LEVEL 1 • CHALLENGING</div>
+        <div class="banner-content">
+          <h2 id="levelTitle" class="banner-title">Stage 1: Multi-Process Kernel Boot</h2>
+          <p id="levelObjective" class="banner-desc">
+            Allocate resources to processes until they have all they need, click <strong>"Run Process"</strong> or build your <strong>User Queue</strong> to execute, and reclaim all resources back!
+          </p>
+        </div>
+        <div class="banner-stats">
+          <div class="stat-pill"><span class="stat-lbl">Goal:</span> <span id="levelTarget">Finish all 5 processes</span></div>
+          <div class="stat-pill"><span class="stat-lbl">Timer:</span> <span id="levelTimer">--:--</span></div>
+        </div>
+      </div>
+
+      <!-- Sandbox Level Configurator -->
+      <div id="sandboxConfigPanel" class="sandbox-config glass-card hidden">
+        <div class="sandbox-header">
+          <h3>🛠️ Custom Matrix & Resource Configurator</h3>
+          <div class="sandbox-actions">
+            <button id="btnPresetClassic" class="cyber-btn sm">Classic Textbook Example</button>
+            <button id="btnPresetDeadlock" class="cyber-btn sm danger">Deadlock Trap Preset</button>
+            <button id="btnRandomizeMatrix" class="cyber-btn sm">🎲 Randomize</button>
+            <button id="btnApplySandbox" class="cyber-btn sm glow-cyan">Apply</button>
+          </div>
+        </div>
+        <div class="sandbox-controls-grid">
+          <div class="config-item">
+            <label for="sbProcessCount">Number of Processes (2-8):</label>
+            <input type="number" id="sbProcessCount" min="2" max="8" value="5" class="cyber-input">
+          </div>
+          <div class="config-item">
+            <label for="sbResourceTypes">Resource Classes:</label>
+            <select id="sbResourceTypes" class="cyber-select">
+              <option value="2">2 (RAM, CPU)</option>
+              <option value="3" selected>3 (RAM, CPU, Disk)</option>
+              <option value="4">4 (RAM, CPU, Disk, Printer)</option>
+              <option value="5">5 (RAM, CPU, Disk, Printer, GPU)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Layout: Available Resources Pool + Process Queue -->
+      <div class="banker-grid">
+        <!-- Left: Available Resources Dock -->
+        <aside class="resources-dock glass-card">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">💾</span>
+              <h3>AVAILABLE RESOURCES</h3>
+            </div>
+            <span class="panel-tag" id="totalResourceSummary">Pool</span>
+          </div>
+
+          <p class="panel-hint">Click <code>[ + ]</code> on a process card or drag a resource chip to allocate.</p>
+
+          <div id="availableResourcesList" class="resources-pool-list">
+            <!-- Dynamic Resource Cards: RAM, CPU, Disk, Printer, GPU -->
+          </div>
+
+          <!-- Deadlock Recovery Tools -->
+          <div class="deadlock-recovery-deck">
+            <h4>🛡️ DEADLOCK RECOVERY</h4>
+            <p class="deck-desc">If system gets stuck in a deadlock, use these OS tools:</p>
+            <div class="deck-buttons">
+              <button id="btnPreemptResource" class="cyber-btn warn sm" title="Reclaim resource from a process">
+                ⚡ Preempt Unit
+              </button>
+              <button id="btnKillProcess" class="cyber-btn danger sm" title="Terminate process to free its allocations">
+                ☠️ Terminate Process
+              </button>
+            </div>
+          </div>
+
+          <!-- Academic View Toggle -->
+          <div class="view-mode-selector">
+            <button id="btnShowCardView" class="view-switch-btn active" title="Visual Cards View">🃏 Visual Cards</button>
+            <button id="btnShowMatrixView" class="view-switch-btn" title="Academic Banker's Matrix View">📊 Matrix Tables</button>
+          </div>
+        </aside>
+
+        <!-- Center/Right: Process Cards / Matrix Workspace -->
+        <main class="process-workspace">
+          <!-- USER PROCESS EXECUTION QUEUE PANEL -->
+          <div id="userQueuePanel" class="user-queue-panel glass-card">
+            <div class="queue-panel-header">
+              <div class="queue-title-wrap">
+                <span class="panel-icon">🎯</span>
+                <div class="queue-heading-group">
+                  <h3 class="queue-title">USER PROCESS EXECUTION QUEUE</h3>
+                  <span class="queue-subtitle">Build your process execution sequence and verify against System State</span>
+                </div>
+              </div>
+              <div class="queue-header-stats">
+                <span id="userQueueCountBadge" class="queue-count-pill">Queue: 0 / 5</span>
+                <button id="btnClearUserQueue" class="cyber-btn sm danger" title="Clear all processes from queue">
+                  🗑️ Clear Queue
+                </button>
+              </div>
+            </div>
+
+            <!-- Queue Pipeline Track -->
+            <div class="user-queue-track-wrap">
+              <div id="userQueueList" class="user-queue-chips-row">
+                <div class="user-queue-empty">
+                  <span class="empty-icon">➕</span>
+                  <span>Click <strong>[+ Add to Queue]</strong> on process cards below or use quick buttons to build your safe sequence!</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Add Bar & Queue Action Controls -->
+            <div class="user-queue-footer">
+              <div class="quick-add-group">
+                <span class="quick-add-label">Quick Add:</span>
+                <div id="userQueueQuickAddBtns" class="quick-add-btns">
+                  <!-- Dynamically populated buttons -->
+                </div>
+              </div>
+
+              <div class="queue-actions-group">
+                <button id="btnVerifyUserQueue" class="cyber-btn" title="Verify if this queue sequence can safely execute">
+                  <span class="btn-icon">🔍</span> Verify Safety
+                </button>
+                <button id="btnStepUserQueue" class="cyber-btn" title="Execute next 1 process in queue">
+                  <span class="btn-icon">⏯</span> Step (1 Proc)
+                </button>
+                <button id="btnRunUserQueue" class="cyber-btn glow-cyan" title="Execute entire queue in sequence">
+                  <span class="btn-icon">▶</span> Execute Queue
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Queue Execution Status Feedback -->
+            <div id="userQueueFeedback" class="queue-feedback-bar hidden"></div>
+          </div>
+
+          <!-- CARD VIEW (Default Gamer UI) -->
+          <div id="processCardsContainer" class="process-cards-grid">
+            <!-- Dynamically populated process cards -->
+          </div>
+
+          <!-- MATRIX VIEW (Academic View) -->
+          <div id="bankerMatrixContainer" class="matrix-tables-container glass-card hidden">
+            <div class="matrix-header">
+              <h3>Academic Banker's Matrix View</h3>
+              <span class="formula-chip">Formula: Need = Max - Allocation</span>
+            </div>
+            <div class="tables-scroll-wrap">
+              <div class="matrix-quad">
+                <div class="matrix-block">
+                  <h4>ALLOCATION MATRIX</h4>
+                  <div id="tableAllocationWrap" class="matrix-table-wrap"></div>
+                </div>
+                <div class="matrix-block">
+                  <h4>MAX CLAIM MATRIX</h4>
+                  <div id="tableMaxWrap" class="matrix-table-wrap"></div>
+                </div>
+                <div class="matrix-block">
+                  <h4>NEED MATRIX (Remaining)</h4>
+                  <div id="tableNeedWrap" class="matrix-table-wrap"></div>
+                </div>
+                <div class="matrix-block">
+                  <h4>AVAILABLE VECTOR</h4>
+                  <div id="tableAvailableWrap" class="matrix-table-wrap"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Banker's Step-by-Step Proof Box -->
+            <div class="banker-proof-box">
+              <h4>Banker's Safety Step-by-Step Evaluation</h4>
+              <div id="bankerProofLog" class="proof-log-terminal">
+                <!-- Step by step log generated by banker-engine.js -->
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 2: CPU SCHEDULING LAB -->
+    <!-- ========================================================================= -->
+    <section id="scheduler-view" class="view-panel">
+      <!-- Scheduler Sub-Bar: Algorithm Select, Controls, Quantum -->
+      <div class="scheduler-subbar glass-card">
+        <div class="subbar-left">
+          <div class="algo-select-group">
+            <span class="selector-label">ALGORITHM:</span>
+            <div class="algo-buttons-bar" role="radiogroup">
+              <button class="algo-btn active" data-algo="FCFS" title="First Come First Served">FCFS</button>
+              <button class="algo-btn" data-algo="SJF" title="Shortest Job First (Non-Preemptive)">SJF</button>
+              <button class="algo-btn" data-algo="SRTF" title="Shortest Remaining Time First">SRTF</button>
+              <button class="algo-btn" data-algo="PRIORITY_NP" title="Priority (Non-Preemptive)">Priority (NP)</button>
+              <button class="algo-btn" data-algo="PRIORITY_P" title="Priority (Preemptive)">Priority (P)</button>
+              <button class="algo-btn" data-algo="RR" title="Round Robin">Round Robin</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="subbar-center">
+          <div id="quantumControlGroup" class="quantum-slider-group hidden">
+            <label for="rrQuantumInput">Time Quantum: <strong id="rrQuantumVal">2</strong> ms</label>
+            <input type="range" id="rrQuantumInput" min="1" max="8" value="2" class="cyber-slider">
+          </div>
+        </div>
+
+        <div class="subbar-right">
+          <button id="btnRunSimulation" class="cyber-btn glow-cyan" title="Run Scheduler Simulation">
+            <span class="btn-icon">▶</span> Calculate Gantt
+          </button>
+          <button id="btnStepSimulation" class="cyber-btn" title="Step by step clock tick">
+            <span class="btn-icon">⏯</span> Step (1ms)
+          </button>
+          <button id="btnCompareAllAlgos" class="cyber-btn glow-amber" title="Compare all algorithms side by side">
+            <span class="btn-icon">📊</span> Compare All
+          </button>
+          <button id="btnResetScheduler" class="cyber-btn danger" title="Reset Process Queue">
+            <span class="btn-icon">🔄</span> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- CPU Scheduling Workspace Grid -->
+      <div class="scheduler-grid">
+        <div class="scheduler-top-grid">
+          <!-- Process Workload Queue Table -->
+          <div class="process-table-card glass-card">
+            <div class="card-header">
+              <div class="header-left-wrap">
+                <span class="panel-icon">📋</span>
+                <h3>PROCESS WORKLOAD QUEUE</h3>
+              </div>
+              <div class="header-actions">
+                <button id="btnAddProcess" class="cyber-btn sm">+ Add Process</button>
+                <button id="btnRandomizeWorkload" class="cyber-btn sm">🎲 Randomize</button>
+                <button id="btnPresetConvoy" class="cyber-btn sm" title="Load Convoy Effect workload">🚛 Convoy Demo</button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table id="schedulerProcessTable" class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Process</th>
+                    <th>Color</th>
+                    <th>Arrival (AT)</th>
+                    <th>Burst (BT)</th>
+                    <th class="priority-col">Priority</th>
+                    <th>Completion</th>
+                    <th>Turnaround</th>
+                    <th>Waiting</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="schedulerTableBody">
+                  <!-- Dynamic rows generated by scheduler-game.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Live CPU Core & Ready Queue Animation -->
+          <div class="cpu-core-card glass-card">
+            <div class="card-header">
+              <span class="panel-icon">⚡</span>
+              <h3>CPU CORE DISPATCHER</h3>
+              <span id="liveClockDisplay" class="clock-badge">TIME: 0 ms</span>
+            </div>
+
+            <div class="cpu-visual-wrapper">
+              <div class="cpu-chip-container">
+                <div class="cpu-chip" id="activeCpuChip">
+                  <div class="chip-inner">
+                    <span class="chip-title">CPU 0</span>
+                    <span id="currentRunningProcName" class="chip-process-name">IDLE</span>
+                  </div>
+                </div>
+                <div class="chip-stats">
+                  <span id="chipRemainingTime">Remaining: --</span>
+                </div>
+              </div>
+
+              <!-- Ready Queue Visual Pipeline -->
+              <div class="ready-queue-track">
+                <span class="track-label">READY QUEUE</span>
+                <div id="readyQueueItems" class="queue-chips-row">
+                  <span class="queue-empty-msg">Queue empty</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle: Dynamic Gantt Chart Card -->
+        <div class="gantt-chart-card glass-card">
+          <div class="card-header">
+            <div class="header-left-wrap">
+              <span class="panel-icon">📈</span>
+              <h3>EXECUTION TIMELINE (GANTT CHART)</h3>
+            </div>
+            <div class="gantt-legend">
+              <span class="legend-item"><span class="legend-box idle"></span> Idle Time</span>
+            </div>
+          </div>
+
+          <div class="gantt-scroll-container">
+            <div id="ganttChartWrapper" class="gantt-render-area">
+              <!-- Rendered blocks populated by gantt-chart.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom: Metrics Dashboard -->
+        <div class="metrics-dashboard-grid">
+          <div class="metric-card glass-card">
+            <span class="metric-icon">⏳</span>
+            <div class="metric-info">
+              <span class="metric-lbl">Avg Waiting Time (AWT)</span>
+              <span id="metricAWT" class="metric-num hud-accent">0.00 ms</span>
+            </div>
+          </div>
+
+          <div class="metric-card glass-card">
+            <span class="metric-icon">🔄</span>
+            <div class="metric-info">
+              <span class="metric-lbl">Avg Turnaround Time (ATAT)</span>
+              <span id="metricATAT" class="metric-num hud-cyan">0.00 ms</span>
+            </div>
+          </div>
+
+          <div class="metric-card glass-card">
+            <span class="metric-icon">⚡</span>
+            <div class="metric-info">
+              <span class="metric-lbl">CPU Utilization</span>
+              <span id="metricCpuUtil" class="metric-num hud-green">100%</span>
+            </div>
+          </div>
+
+          <div class="metric-card glass-card">
+            <span class="metric-icon">🚀</span>
+            <div class="metric-info">
+              <span class="metric-lbl">Throughput</span>
+              <span id="metricThroughput" class="metric-num">0.00 proc/ms</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-Algorithm Comparison Panel -->
+        <div id="algoComparisonPanel" class="comparison-panel glass-card hidden">
+          <div class="panel-header">
+            <h3>🏆 Algorithm Comparison (Identical Workload)</h3>
+            <button id="btnCloseComparison" class="cyber-btn sm">✖ Close</button>
+          </div>
+          <div class="table-container">
+            <table class="cyber-table comparison-table">
+              <thead>
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Avg Waiting Time</th>
+                  <th>Avg Turnaround Time</th>
+                  <th>Max Waiting Time</th>
+                  <th>Context Switches</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody id="comparisonTableBody">
+                <!-- Populated dynamically by scheduler-game.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 3: RESOURCE ALLOCATION GRAPH (RAG) -->
+    <!-- ========================================================================= -->
+    <section id="rag-view" class="view-panel">
+      <div class="rag-subbar glass-card">
+        <div class="subbar-left">
+          <h3>🕸️ Resource Allocation Graph (RAG)</h3>
+        </div>
+        <div class="subbar-center">
+          <div id="ragCycleBadge" class="safety-badge safe">
+            <span id="ragCycleStatus">🟢 NO CYCLE DETECTED</span>
+          </div>
+        </div>
+        <div class="subbar-right">
+          <button id="btnRagSyncFromBanker" class="cyber-btn" title="Sync RAG with Banker's Current State">
+            🔄 Sync with Level
+          </button>
+          <button id="btnRagAddDeadlockCycle" class="cyber-btn danger" title="Inject a Deadlock Cycle">
+            ⚠️ Inject Cycle Trap
+          </button>   
+          <button id="btnRagClear" class="cyber-btn" title="Clear Graph">
+            🗑️ Clear
+          </button>
+        </div>
+      </div>
+
+      <div class="rag-main-layout">
+        <div class="rag-canvas-container glass-card">
+          <canvas id="ragCanvas" width="900" height="520"></canvas>
+          <div class="canvas-legend">
+            <span class="rag-legend-item"><span class="node-sample proc">P</span> Process (Circle)</span>
+            <span class="rag-legend-item"><span class="node-sample res">R</span> Resource (Box)</span>
+            <span class="rag-legend-item"><span class="edge-sample req"></span> Request (P → R)</span>
+            <span class="rag-legend-item"><span class="edge-sample alloc"></span> Allocation (R → P)</span>
+            <span class="rag-legend-item"><span class="edge-sample cycle"></span> Deadlock Cycle</span>
+          </div>
+        </div>
+
+        <aside class="rag-sidebar glass-card">
+          <h4>GRAPH RULES</h4>
+          <div class="rag-rules-box">
+            <div class="rule-item">
+              <span class="rule-num">1</span>
+              <p><strong>Single-Unit Resources:</strong> A cycle in the graph = <em>Deadlock Guaranteed</em>.</p>
+            </div>
+            <div class="rule-item">
+              <span class="rule-num">2</span>
+              <p><strong>Multi-Unit Resources:</strong> A cycle is a warning, but might not cause a deadlock if other processes finish first.</p>
+            </div>
+          </div>
+
+          <div class="rag-action-controls">
+            <h4>ADD NODES</h4>
+            <div class="add-node-row">
+              <button id="btnRagAddProc" class="cyber-btn sm">+ Add Process</button>
+              <button id="btnRagAddRes" class="cyber-btn sm">+ Add Resource</button>
+            </div>
+            <div class="rag-instructions">
+              <p>💡 <em>Drag nodes to rearrange. Click Process then Resource to create Request Edge ($P \to R$). Click Resource then Process to Allocate ($R \to P$).</em></p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 4: OS KNOWLEDGE HUB -->
+    <!-- ========================================================================= -->
+    <section id="theory-view" class="view-panel">
+      <div class="theory-container">
+        <aside class="theory-nav glass-card">
+          <h3>📚 OS Topics</h3>
+          <ul class="theory-menu">
+            <li><button class="theory-nav-btn active" data-topic="bankers">Banker's Algorithm</button></li>
+            <li><button class="theory-nav-btn" data-topic="deadlock">The 4 Deadlock Conditions</button></li>
+            <li><button class="theory-nav-btn" data-topic="prevention">Deadlock Prevention & Recovery</button></li>
+            <li><button class="theory-nav-btn" data-topic="rag">Resource Graphs (RAG)</button></li>
+            <li><button class="theory-nav-btn" data-topic="fcfs">FCFS & Convoy Effect</button></li>
+            <li><button class="theory-nav-btn" data-topic="sjf">SJF & SRTF Scheduling</button></li>
+            <li><button class="theory-nav-btn" data-topic="priority">Priority & Aging</button></li>
+            <li><button class="theory-nav-btn" data-topic="roundrobin">Round Robin & Quantum</button></li>
+            <li><button class="theory-nav-btn" data-topic="formulas">Formulas Cheat-Sheet</button></li>
+          </ul>
+        </aside>
+
+        <div class="theory-content glass-card" id="theoryContentBody">
+          <!-- Populated by os-theory.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Level Completed / Victory Modal -->
+  <div id="victoryModal" class="cyber-modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <span class="modal-icon">🎉</span>
+        <h2>STAGE COMPLETED!</h2>
+      </div>
+      <div class="modal-body">
+        <p id="modalMsg" class="modal-desc">All processes received their resources safely without deadlock!</p>
+        <div class="modal-score-breakdown">
+          <div class="score-row"><span>Processes Finished:</span> <strong id="modalFinishedCount">5/5</strong></div>
+          <div class="score-row"><span>Safe Sequence Executed:</span> <strong id="modalSafeSeq" class="hud-cyan">[ P1 → P3 → P0 → P2 → P4 ]</strong></div>
+          <div class="score-row"><span>Stage Score:</span> <strong id="modalStageScore" class="hud-accent">+500 PTS</strong></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnModalReplay" class="cyber-btn">Replay Stage</button>
+        <button id="btnModalNext" class="cyber-btn glow-cyan">Next Stage ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deadlock / Game Over Modal -->
+  <div id="deadlockModal" class="cyber-modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card glass-card danger-modal">
+      <div class="modal-header">
+        <span class="modal-icon">⚠️</span>
+        <h2>DEADLOCK DETECTED!</h2>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          A circular wait occurred! The remaining processes are waiting on resources held by each other.
+        </p>
+        <div class="deadlock-explain-box" id="deadlockDetailsBox">
+          <!-- Populated with cycle info -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnModalDeadlockReset" class="cyber-btn danger">Try Again 🔄</button>
+        <button id="btnModalDeadlockRecover" class="cyber-btn warn">Use Recovery Tool ⚡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help & Tutorial Dialog -->
+  <div id="helpModal" class="cyber-modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <span class="modal-icon">🎮</span>
+        <h2>How to Play Kernel Master</h2>
+        <button id="btnCloseHelp" class="icon-close">✖</button>
+      </div>
+      <div class="modal-body help-body">
+        <div class="help-section">
+          <h3>💾 Mode 1: Resource Allocation (Banker's Algorithm)</h3>
+          <ul>
+            <li><strong>Objective:</strong> Help all processes finish by granting their required resources (RAM, CPU, Disk, Printer, GPU).</li>
+            <li><strong>The Core Rule:</strong> When a process gets its <em>Full Need</em>, click <strong>"Run Process"</strong>. It finishes and returns <strong>ALL</strong> its allocated resources back to your available pool!</li>
+            <li><strong>Safe State (🟢):</strong> There exists an order (Safe Sequence) where every process can eventually finish.</li>
+            <li><strong>Deadlock (⚠️):</strong> When available resources run out and every remaining process is waiting on others.</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h3>⚡ Mode 2: CPU Scheduling Lab</h3>
+          <ul>
+            <li><strong>Algorithms:</strong> Switch between FCFS, SJF, SRTF, Priority, and Round Robin to compare Waiting Time and Turnaround Time on a dynamic Gantt chart.</li>
+            <li><strong>Benchmark:</strong> Click <em>"Compare All"</em> to test which algorithm performs best on the current workload!</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnHelpGotIt" class="cyber-btn glow-cyan">Got it, Let's Play!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/audio.js"></script>
+  <script src="js/utils/storage.js"></script>
+  <script src="js/utils/particle-fx.js"></script>
+  <script src="js/banker/banker-engine.js"></script>
+  <script src="js/banker/banker-levels.js"></script>
+  <script src="js/banker/rag-visualizer.js"></script>
+  <script src="js/banker/banker-game.js"></script>
+  <script src="js/scheduler/scheduler-engine.js"></script>
+  <script src="js/scheduler/gantt-chart.js"></script>
+  <script src="js/scheduler/scheduler-game.js"></script>
+  <script src="js/guide/os-theory.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

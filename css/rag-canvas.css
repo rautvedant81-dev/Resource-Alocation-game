@@ -1,0 +1,316 @@
+/* ==========================================================================
+   KERNEL MASTER: Mode 3 & 4 - Light Theme RAG Canvas & Theory Hub
+   ========================================================================== */
+
+/* RAG Subbar */
+.rag-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 12px 18px;
+  flex-wrap: wrap;
+}
+
+.rag-subbar h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* RAG Main Layout */
+.rag-main-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* RAG Canvas Container */
+.rag-canvas-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-surface);
+  padding: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+#ragCanvas {
+  width: 100%;
+  height: 520px;
+  display: block;
+  cursor: crosshair;
+  background: #f8fafc;
+}
+
+body.theme-dark #ragCanvas {
+  background: #040813;
+}
+
+.canvas-legend {
+  display: flex;
+  gap: 14px;
+  padding: 10px 18px;
+  background: var(--bg-surface-elevated);
+  width: 100%;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.rag-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.node-sample {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 10px;
+}
+
+.node-sample.proc {
+  background: var(--primary-bg);
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  color: var(--primary);
+}
+
+.node-sample.res {
+  background: var(--res-disk-bg);
+  border: 2px solid var(--res-disk);
+  border-radius: 4px;
+  color: var(--res-disk);
+}
+
+.edge-sample {
+  width: 22px;
+  height: 3px;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.edge-sample.req {
+  background: var(--warning);
+}
+
+.edge-sample.alloc {
+  background: var(--primary);
+}
+
+.edge-sample.cycle {
+  background: var(--danger);
+  box-shadow: 0 0 6px var(--danger);
+}
+
+/* RAG Sidebar */
+.rag-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rag-sidebar h4 {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 8px;
+}
+
+.rag-rules-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rule-item {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rule-num {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-bg);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rag-action-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-node-row {
+  display: flex;
+  gap: 8px;
+}
+
+.rag-instructions {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   THEORY & KNOWLEDGE HUB STYLES
+   ========================================================================== */
+.theory-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.theory-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theory-nav h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 8px;
+}
+
+.theory-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.theory-nav-btn {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  padding: 9px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theory-nav-btn:hover {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+}
+
+.theory-nav-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.theory-content {
+  padding: 28px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.theory-content h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
+}
+
+.theory-content h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 20px 0 8px 0;
+}
+
+.theory-content p {
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+}
+
+.theory-content ul, .theory-content ol {
+  padding-left: 22px;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.theory-content li {
+  margin-bottom: 6px;
+}
+
+.theory-content strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.theory-diagram-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin: 16px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--primary-dark);
+  font-weight: 600;
+  overflow-x: auto;
+}
+
+body.theme-dark .theory-diagram-card {
+  color: var(--primary-light);
+  background: #090e1a;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1100px) {
+  .banker-grid {
+    grid-template-columns: 1fr;
+  }
+  .scheduler-top-grid {
+    grid-template-columns: 1fr;
+  }
+  .rag-main-layout {
+    grid-template-columns: 1fr;
+  }
+  .theory-container {
+    grid-template-columns: 1fr;
+  }
+}
